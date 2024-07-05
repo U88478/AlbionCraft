@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <title>Albion Crafting Calculator</title>
+</head>
+<body>
+<div class="search-container">
+    <input type="text" id="search-input" placeholder="Search for items...">
+    <select id="tier-filter">
+        <option value="all">All Tiers</option>
+        <option value="4">Tier 4</option>
+        <option value="5">Tier 5</option>
+        <option value="6">Tier 6</option>
+        <option value="7">Tier 7</option>
+        <option value="8">Tier 8</option>
+    </select>
+    <select id="ench-filter">
+        <option value="all">All Enchantments</option>
+        <option value="0">Enchantment 0</option>
+        <option value="1">Enchantment 1</option>
+        <option value="2">Enchantment 2</option>
+        <option value="3">Enchantment 3</option>
+        <option value="4">Enchantment 4</option>
+    </select>
+    <button id="crafting-page-button">Craft</button>
+    <div id="search-results"></div>
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

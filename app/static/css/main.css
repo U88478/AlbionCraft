@@ -1,0 +1,78 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #121212;
+    color: #E0E0E0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+#search-input, #tier-filter, #ench-filter, #crafting-page-button {
+    margin-right: 10px;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: none;
+    outline: none;
+}
+
+#search-input {
+    flex-grow: 1;
+    background-color: #333333;
+    color: #E0E0E0;
+}
+
+#tier-filter, #ench-filter {
+    background-color: #333333;
+    color: #E0E0E0;
+}
+
+#crafting-page-button {
+    background-color: #03DAC6;
+    color: #121212;
+    cursor: pointer;
+}
+
+#crafting-page-button:hover {
+    background-color: #028D9B;
+}
+
+#search-results {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    background-color: #333333;
+    border: 1px solid #444444;
+    max-height: 400px;
+    overflow-y: auto;
+    display: none;
+    z-index: 1000;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.search-result-item img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.search-result-item:hover {
+    background-color: #444444;
+}

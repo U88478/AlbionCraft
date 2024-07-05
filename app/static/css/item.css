@@ -1,0 +1,96 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #17183B; /* Space cadet */
+    color: #FBFFFE; /* Snow white */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #1B1B1E; /* Jet black */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+    width: 600px;
+    text-align: center;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header img {
+    width: 150px;
+    height: 150px;
+    margin-left: 20px;
+}
+
+.tab {
+    background-color: #6D676E; /* Dim gray */
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    display: inline-block;
+    margin: 10px;
+    border-radius: 5px;
+}
+
+.tab.active {
+    background-color: #FAA916; /* Golden yellow */
+    color: #17183B; /* Space cadet */
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.ingredient-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.calculator {
+    margin-top: 20px;
+    background-color: #6D676E; /* Dim gray */
+    padding: 15px;
+    border-radius: 10px;
+    color: #17183B; /* Space cadet */
+}
+
+#craft-quantity {
+    padding: 10px;
+    font-size: 16px;
+    width: 80px;
+    border-radius: 5px;
+    border: 1px solid #FAA916; /* Golden yellow */
+    background-color: #FBFFFE; /* Snow white */
+    color: #17183B; /* Space cadet */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #FAA916; /* Golden yellow */
+    color: #17183B; /* Space cadet */
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #FFD700; /* Lighter yellow */
+    color: #17183B; /* Space cadet */
+}
