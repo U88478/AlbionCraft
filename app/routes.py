@@ -110,7 +110,7 @@ def popular_items():
 
 
 def get_item_price(unique_name):
-    item = Item.query.filter_by(unique_name=unique_name).first()
+    item = session.query(Item).filter_by(unique_name=unique_name).first()
     if item and item.prices:
         return item.prices[-1].price  # Return the latest price
     return 0
