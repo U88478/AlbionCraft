@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                 </div>
                             </div>
+                            </div>
                             <div class="market-graph">
                                 <h3>Market Trends</h3>
                                 <div id="market-graphs-container"></div>
