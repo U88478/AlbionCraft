@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Ensure loadItemDetails is in the global scope
     window.loadItemDetails = function(unique_name) {
         fetch(`/item/${unique_name}`)
             .then(response => response.json())
@@ -58,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <img src="https://render.albiononline.com/v1/item/${data.item.unique_name}" alt="${data.item.en_name}" class="item-image">
                                 <div class="item-info">
                                     <h2>${data.item.en_name}</h2>
-                                    <p id="item-value">Estimated Market Price: ${data.item.market_price}</p>
+                                    <p id="item-value">Estimated Market Price: <span id="market-price">${data.item.market_price}</span></p>
                                 </div>
                             </div>
                             <div class="section-div">
@@ -234,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const quantity = parseInt(document.getElementById('craft-quantity').value, 10);
         const fame = parseInt(document.getElementById('fame-per-item').value, 10);
         const returnRate = parseInt(document.getElementById('return-rate').value, 10);
-        const itemValue = parseInt(document.getElementById('item-value').value, 10);
+        const itemValue = parseInt(document.getElementById('item-value').textContent.split(': ')[1] || 0, 10);
 
         let totalSilver = 0;
 
