@@ -4,30 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='icons/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='icons/site.webmanifest') }}">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
     <title>Albion Crafting Calculator</title>
 </head>
 <body>
-<div class="search-container">
+<header>
+    <div class="logo">
+        <img src="{{ url_for('static', filename='icons/favicon-32x32.png') }}" alt="Logo">
+    </div>
+    <h1>Albion Crafting Calculator</h1>
+</header>
+<div class="search-bar">
     <input type="text" id="search-input" placeholder="Search for items...">
-    <select id="tier-filter">
-        <option value="all">All Tiers</option>
-        <option value="4">Tier 4</option>
-        <option value="5">Tier 5</option>
-        <option value="6">Tier 6</option>
-        <option value="7">Tier 7</option>
-        <option value="8">Tier 8</option>
-    </select>
-    <select id="ench-filter">
-        <option value="all">All Enchantments</option>
-        <option value="0">Enchantment 0</option>
-        <option value="1">Enchantment 1</option>
-        <option value="2">Enchantment 2</option>
-        <option value="3">Enchantment 3</option>
-        <option value="4">Enchantment 4</option>
-    </select>
-    <button id="crafting-page-button">Craft</button>
-    <div id="search-results"></div>
+    <div id="search-results" class="search-results"></div>
 </div>
+<div class="content" id="content">
+    <div class="popular-items">
+        <h3>Popular Items</h3>
+        <div id="popular-items-list" class="grid">
+            <!-- Example popular items (to be dynamically populated) -->
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

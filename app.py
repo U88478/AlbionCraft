@@ -1,6 +1,20 @@
-from app import create_app
+from flask import Flask
+from app.routes import bp
 
-app = create_app()
+from models import init_app
+
+
+def create_app():
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///models/albion_items.db'
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    init_app(app)
+    app.register_blueprint(bp)
+
+    return app
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=8000)
+    app = create_app()
+    app.run(debug=True, host='127.0.0.1', port=8000)
