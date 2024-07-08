@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Global prices object to store item prices
+    const prices = {};
+
     const searchInput = document.getElementById('search-input');
     const searchResultsDiv = document.getElementById('search-results');
     const contentDiv = document.getElementById('content');
@@ -139,7 +142,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                 </div>
                             </div>
-                            </div>
                             <div class="market-graph">
                                 <h3>Market Trends</h3>
                                 <div id="market-graphs-container"></div>
@@ -171,11 +173,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             let latestPrice = prices.reduce((prev, curr) => {
                                 return new Date(prev.last_updated) > new Date(curr.last_updated) ? prev : curr;
                             });
+                            console.log(latestPrice.price);
                             document.getElementById('market-price').innerText = latestPrice.price;
                         } else {
                             document.getElementById('market-price').innerText = 'No price data';
                         }
-                        console.log(latestPrice.price);
                     })
                     .catch(error => {
                         console.error('Error fetching item price:', error);
@@ -188,6 +190,13 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`/item_prices/${unique_name}`)
             .then(response => response.json())
             .then(data => {
+                // Store prices in global object
+                Object.keys(data).forEach(city => {
+                    data[city].forEach(priceData => {
+                        prices[priceData.city] = priceData.price;
+                    });
+                });
+
                 const graphsContainer = document.getElementById('market-graphs-container');
                 graphsContainer.innerHTML = ''; // Clear previous graphs
 
@@ -225,6 +234,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
             });
+    }
+
+    function getItemPrice(unique_name) {
+        // Fetch the item price from the global prices object
+        return prices[unique_name] || 0;
     }
 
     function updateCalculator() {
