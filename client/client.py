@@ -125,8 +125,7 @@ def send_price_data(unique_name, city, price):
         data = {
             'unique_name': unique_name,
             'city': city,
-            'price': price,
-            'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'price': price
         }
         response = requests.post(url, json=data)
         if response.status_code == 200:
