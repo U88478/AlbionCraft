@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Ensure loadItemDetails is in the global scope
     window.loadItemDetails = function(unique_name) {
         fetch(`/item/${unique_name}`)
             .then(response => response.json())
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <img src="https://render.albiononline.com/v1/item/${data.item.unique_name}" alt="${data.item.en_name}" class="item-image">
                                 <div class="item-info">
                                     <h2>${data.item.en_name}</h2>
-                                    <p id="item-value">Estimated Market Price: <span id="market-price">${data.item.market_price}</span></p>
+                                    <p id="item-value">Estimated Market Price: ${data.item.market_price}</p>
                                 </div>
                             </div>
                             <div class="section-div">
@@ -193,11 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 x: {
                                     type: 'time',
                                     time: {
-                                        unit: 'day',
-                                        tooltipFormat: 'll HH:mm',
-                                        displayFormats: {
-                                            day: 'MMM D'
-                                        }
+                                        unit: 'day'
                                     }
                                 },
                                 y: {
@@ -211,29 +208,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getItemPrice(unique_name) {
-        return fetch(`/item_prices/${unique_name}`)
-            .then(response => response.json())
-            .then(data => {
-                let prices = Object.values(data).flat();
-                if (prices.length > 0) {
-                    let latestPrice = prices.reduce((prev, curr) => {
-                        return new Date(prev.last_updated) > new Date(curr.last_updated) ? prev : curr;
-                    });
-                    return latestPrice.price;
-                }
-                return 0;
-            })
-            .catch(error => {
-                console.error('Error fetching item price:', error);
-                return 0;
-            });
-    }
+    return fetch(`/item_prices/${unique_name}`)
+        .then(response => response.json())
+        .then(data => {
+            let prices = Object.values(data).flat();
+            if (prices.length > 0) {
+                let latestPrice = prices.reduce((prev, curr) => {
+                    return new Date(prev.last_updated) > new Date(curr.last_updated) ? prev : curr;
+                });
+                return latestPrice.price;
+            }
+            return 0;
+        })
+        .catch(error => {
+            console.error('Error fetching item price:', error);
+            return 0;
+        });
+}
 
     function updateCalculator() {
         const quantity = parseInt(document.getElementById('craft-quantity').value, 10);
         const fame = parseInt(document.getElementById('fame-per-item').value, 10);
         const returnRate = parseInt(document.getElementById('return-rate').value, 10);
-        const itemValue = parseInt(document.getElementById('item-value').textContent.split(': ')[1] || 0, 10);
+        const itemValue = parseInt(document.getElementById('item-value').value, 10);
 
         let totalSilver = 0;
 

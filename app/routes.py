@@ -124,6 +124,9 @@ def item_prices(unique_name):
         if price.city not in prices_by_city:
             prices_by_city[price.city] = []
         prices_by_city[price.city].append(price.to_dict())
+
+    print(f"Fetched prices for {unique_name}: {prices_by_city}")
+
     return jsonify(prices_by_city)
 
 
