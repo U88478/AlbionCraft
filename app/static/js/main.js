@@ -194,7 +194,11 @@ document.addEventListener('DOMContentLoaded', function() {
                                 x: {
                                     type: 'time',
                                     time: {
-                                        unit: 'day'
+                                        unit: 'day',
+                                        tooltipFormat: 'll HH:mm',
+                                        displayFormats: {
+                                            day: 'MMM D'
+                                        }
                                     }
                                 },
                                 y: {
@@ -208,19 +212,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getItemPrice(unique_name) {
-    return fetch(`/item_prices/${unique_name}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.price) {
-                return data.price;
-            }
-            return 0;
-        })
-        .catch(error => {
-            console.error('Error fetching item price:', error);
-            return 0;
-        });
-}
+        return fetch(`/item_prices/${unique_name}`)
+            .then(response => response.json())
+            .then(data => {
+                let prices = Object.values(data).flat();
+                if (prices.length > 0) {
+                    let latestPrice = prices.reduce((prev, curr) => {
+                        return new Date(prev.last_updated) > new Date(curr.last_updated) ? prev : curr;
+                    });
+                    return latestPrice.price;
+                }
+                return 0;
+            })
+            .catch(error => {
+                console.error('Error fetching item price:', error);
+                return 0;
+            });
+    }
 
     function updateCalculator() {
         const quantity = parseInt(document.getElementById('craft-quantity').value, 10);
