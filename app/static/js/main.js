@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 ${data.ingredients.map(ingredient => `
                                                     <tr class="ingredient-row" data-ingredient="${ingredient.unique_name}">
                                                         <td>${ingredient.quantity} x <img src="https://render.albiononline.com/v1/item/${ingredient.unique_name}" alt="${ingredient.name}" class="ingredient-image">${ingredient.name}</td>
-                                                        <td><input type="number" class="ingredient-quantity" value="${ingredient.quantity}" min="0"></td>
+                                                        <td><input type="number" class="ingredient-quantity" value="${ingredient.quantity}" readonly min="0"></td>
                                                         <td><input type="number" class="ingredient-have" value="0" min="0"></td>
                                                         <td><input type="number" class="ingredient-total" value="0" readonly></td>
                                                         <td><input type="number" class="ingredient-silver" value="0" readonly></td>
