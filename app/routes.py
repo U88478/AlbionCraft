@@ -2,6 +2,7 @@ import json
 import re
 
 from flask import Flask, render_template, request, jsonify, Blueprint
+from sqlalchemy.orm import joinedload
 
 from app.extensions import db
 from models.models import Item
@@ -29,9 +30,15 @@ def search_items():
 
 @bp.route('/item/<unique_name>')
 def item_details(unique_name):
-    item = session.query(Item).filter_by(unique_name=unique_name).first_or_404()
+    item = session.query(Item).filter_by(unique_name=unique_name).first()
+
+    # Handle the case where the exact item (including enchantment level) is not found
+    if not item:
+        return jsonify({'error': 'Item not found'}), 404
+
     ingredients = []
 
+    # Try to get the ingredients for the exact item first
     if item.ingredients:
         try:
             item_ingredients = json.loads(item.ingredients)
@@ -41,8 +48,10 @@ def item_details(unique_name):
     else:
         item_ingredients = []
 
+    # Prepare ingredients data for response
     for ingredient in item_ingredients:
         ingredient_unique_name = ingredient['ingredient']
+        print(ingredient_unique_name)
         ingredient_quantity = ingredient['quantity']
         ingredient_item = session.query(Item).filter_by(unique_name=ingredient_unique_name).first()
         if ingredient_item:
@@ -52,8 +61,12 @@ def item_details(unique_name):
                 'unique_name': ingredient_unique_name
             })
 
+        print(ingredients)
+
+    # Get similar items
     general_item = re.sub(r"(T\d_)|(_LEVEL\d)|(@\d)", "", item.unique_name)
     similar_items = session.query(Item).filter(Item.unique_name.contains(general_item)).all()
+
     data = {
         'item': item.to_dict(),
         'ingredients': ingredients,
@@ -90,14 +103,27 @@ def calculate_craft():
 
 @bp.route('/popular_items')
 def popular_items():
-    popular_items = session.query(Item).limit(10).all()
+    popular_items = session.query(Item).limit(20).all()
     data = {'items': [item.to_dict() for item in popular_items]}
     return jsonify(data)
 
 
 def get_item_price(unique_name):
-    # TODO: Replace with actual price fetching logic
-    return 100
+    item = Item.query.filter_by(unique_name=unique_name).first()
+    if item and item.prices:
+        return item.prices[-1].price  # Return the latest price
+    return 0
+
+
+@bp.route('/item_prices/<unique_name>')
+def item_prices(unique_name):
+    item = session.query(Item).filter_by(unique_name=unique_name).options(joinedload(Item.prices)).first_or_404()
+    prices_by_city = {}
+    for price in item.prices:
+        if price.city not in prices_by_city:
+            prices_by_city[price.city] = []
+        prices_by_city[price.city].append(price.to_dict())
+    return jsonify(prices_by_city)
 
 
 app.register_blueprint(bp)

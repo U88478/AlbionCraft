@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <p>Unique Name: ${data.item.unique_name}</p>
                                         <p>Tier: ${data.item.tier}</p>
                                         <p>Set: ${data.item.set}</p>
+                                        <p>Item Power: ${data.item.item_power}</p>
                                         <p>Enchantment Level: ${data.item.enchantment_level}</p>
                                     </div>
                                     <div id="ingredients-list" class="tab-content active">
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                             <div class="market-graph">
                                 <h3>Market Trends</h3>
-                                <canvas id="market-graph"></canvas>
+                                <div id="market-graphs-container"></div>
                             </div>
                         </div>
                     </div>
@@ -156,23 +157,70 @@ document.addEventListener('DOMContentLoaded', function() {
                     input.addEventListener('input', updateCalculator);
                 });
 
-                updateCalculator()
+                updateCalculator();
 
                 // Initialize the graph
-                initGraph();
+                fetchItemPrices(unique_name);
+            });
+    }
+
+    function fetchItemPrices(unique_name) {
+        fetch(`/item_prices/${unique_name}`)
+            .then(response => response.json())
+            .then(data => {
+                const graphsContainer = document.getElementById('market-graphs-container');
+                graphsContainer.innerHTML = ''; // Clear previous graphs
+
+                Object.keys(data).forEach(city => {
+                    const cityData = data[city];
+                    const canvas = document.createElement('canvas');
+                    graphsContainer.appendChild(canvas);
+
+                    const ctx = canvas.getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: cityData.map(entry => entry.last_updated),
+                            datasets: [{
+                                label: `${city} Prices`,
+                                data: cityData.map(entry => entry.price),
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                });
             });
     }
 
     function getItemPrice(unique_name) {
-        // Mocked price fetching function, replace with actual API call if available
-        const prices = {
-            'T4_METALBAR': 1,
-            'T5_METALBAR': 2,
-            'T8_PLANKS_LEVEL4@4': 3,
-        };
-        return prices[unique_name] || 0;
-    }
-
+    return fetch(`/item_prices/${unique_name}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.price) {
+                return data.price;
+            }
+            return 0;
+        })
+        .catch(error => {
+            console.error('Error fetching item price:', error);
+            return 0;
+        });
+}
 
     function updateCalculator() {
         const quantity = parseInt(document.getElementById('craft-quantity').value, 10);
@@ -204,31 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         document.getElementById('total-silver').value = totalSilver;
         document.getElementById('total-fame').value = fame * quantity;
-        document.getElementById('profit-silver').value = itemValue-totalSilver;
-    }
-
-    function initGraph() {
-        const ctx = document.getElementById('market-graph').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-                datasets: [{
-                    label: 'Price',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
+        document.getElementById('profit-silver').value = itemValue - totalSilver;
     }
 
     // Initial load of popular items

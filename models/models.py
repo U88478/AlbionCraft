@@ -27,8 +27,10 @@ class Item(Base):
             'en_name': self.en_name,
             'tier': self.tier,
             'set': self.set,
+            'item_power': self.item_power,
             'enchantment_level': self.enchantment_level,
             'ingredients': self.ingredients,
+            'prices': [price.to_dict() for price in self.prices]  # Include prices
         }
 
 
@@ -41,3 +43,10 @@ class Price(Base):
     last_updated = Column(Date)
 
     item = relationship("Item", back_populates="prices")
+
+    def to_dict(self):
+        return {
+            'city': self.city,
+            'price': self.price,
+            'last_updated': self.last_updated.strftime('%Y-%m-%d %H:%M:%S')
+        }
