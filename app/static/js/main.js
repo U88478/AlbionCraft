@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else {
                             document.getElementById('market-price').innerText = 'No price data';
                         }
+                        console.log(latestPrice.price);
                     })
                     .catch(error => {
                         console.error('Error fetching item price:', error);
@@ -230,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const quantity = parseInt(document.getElementById('craft-quantity').value, 10);
         const fame = parseInt(document.getElementById('fame-per-item').value, 10);
         const returnRate = parseInt(document.getElementById('return-rate').value, 10);
-        const itemValue = parseInt(document.getElementById('item-value').value, 10);
+        const itemValue = parseInt(document.getElementById('market-price').innerText, 10);
 
         let totalSilver = 0;
 
