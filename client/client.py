@@ -2,6 +2,7 @@ import json
 import logging
 import re
 import sys
+from datetime import datetime
 from os.path import dirname, abspath, exists
 
 import pyshark
@@ -124,7 +125,8 @@ def send_price_data(unique_name, city, price):
         data = {
             'unique_name': unique_name,
             'city': city,
-            'price': price
+            'price': price,
+            'last_updated': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
         response = requests.post(url, json=data)
         if response.status_code == 200:
