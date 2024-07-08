@@ -1,11 +1,12 @@
 import json
 import re
+from datetime import datetime
 
 from flask import Flask, render_template, request, jsonify, Blueprint
 from sqlalchemy.orm import joinedload
 
 from app.extensions import db
-from models.models import Item
+from models.models import Item, Price
 
 app = Flask(__name__)
 bp = Blueprint('routes', __name__)
@@ -124,6 +125,30 @@ def item_prices(unique_name):
             prices_by_city[price.city] = []
         prices_by_city[price.city].append(price.to_dict())
     return jsonify(prices_by_city)
+
+
+@bp.route('/update_price', methods=['POST'])
+def update_price():
+    data = request.json
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    unique_name = data.get('unique_name')
+    city = data.get('city')
+    price = data.get('price')
+
+    if not unique_name or not city or price is None:
+        return jsonify({'error': 'Missing data'}), 400
+
+    item = Item.query.filter_by(unique_name=unique_name).first()
+    if not item:
+        return jsonify({'error': f'Item {unique_name} not found'}), 404
+
+    price_data = Price(item_id=item.id, city=city, price=price, last_updated=datetime.now())
+    db.session.add(price_data)
+    db.session.commit()
+
+    return jsonify({'success': 'Price updated successfully'}), 200
 
 
 app.register_blueprint(bp)

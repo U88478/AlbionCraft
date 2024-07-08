@@ -2,37 +2,29 @@ import json
 import logging
 import re
 import sys
-from datetime import datetime
 from os.path import dirname, abspath, exists
 
 import pyshark
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import requests
 
 sys.path.append(dirname(dirname(abspath(__file__))))
-from models.models import Item, Price
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Database setup
-engine = create_engine('sqlite:///../models/albion_items.db')
-Session = sessionmaker(bind=engine)
-session = Session()
-
 # Dictionary to store partial messages
 message_buffer = {}
 current_city = "Unknown"
-last_logged_city = "Unknown"  # Track the last logged location
+last_logged_city = "Unknown"
 
 # Constants for mapping market location IDs to city names
 LOCATION_ID_TO_CITY = {
-    "0007": "Thetford Market",
-    "1002": "Lymhurst Market",
-    "2004": "Bridgewatch Market",
-    "3005": "Caerleon Market",
-    "3008": "Martlock Market",
-    "4002": "Fort Sterling Market",
+    "0007": "Thetford",
+    "1002": "Lymhurst",
+    "2004": "Bridgewatch",
+    "3005": "Caerleon",
+    "3008": "Martlock",
+    "4002": "Fort Sterling",
 }
 
 # Ensure the last location file exists
@@ -85,8 +77,8 @@ def extract_info_from_packet(packet):
                     current_city = LOCATION_ID_TO_CITY.get(location_id, "Unknown")
                     if current_city != last_logged_city:
                         logging.info(f"Current Location: {current_city}")
-                        last_logged_city = current_city  # Update the last logged location
-                        save_last_location(current_city)  # Save the location to the database
+                        last_logged_city = current_city
+                        save_last_location(current_city)
             elif src_ip.startswith("5.188.125.15"):
                 # Market packet
                 packet_id = f"{packet.ip.src}:{packet.udp.srcport}->{packet.ip.dst}:{packet.udp.dstport}"
@@ -96,20 +88,15 @@ def extract_info_from_packet(packet):
                 if json_payload:
                     unique_name = json_payload.get("ItemTypeId", "N/A")
                     unit_price = int(json_payload.get("UnitPriceSilver", 0)) // 10000
-                    total_price = int(json_payload.get("TotalPriceSilver", 0)) // 10000
-                    amount = json_payload.get("Amount", 0)
-                    tier = json_payload.get("Tier", 0)
-                    seller_name = json_payload.get("SellerName", "N/A")
-                    city = current_city[:-7]  # Remove the last 7 characters to get the city name
+                    city = current_city
 
-                    logging.info(
-                        f"Data: {unique_name}, {unit_price}, {total_price}, {amount}, {tier}, {seller_name}, {city}")
-                    save_price_data(unique_name, city, unit_price)  # Save the price to the database
+                    logging.info(f"Data: {unique_name}, {unit_price}, {city}")
+                    send_price_data(unique_name, city, unit_price)
     except Exception as e:
         logging.error(f"Error processing packet: {e}")
 
 
-# Function to save the last location to the database
+# Function to save the last location to a file
 def save_last_location(location):
     try:
         with open(location_file_path, 'w') as file:
@@ -118,7 +105,7 @@ def save_last_location(location):
         logging.error(f"Error saving last location: {e}")
 
 
-# Function to load the last location from the database
+# Function to load the last location from a file
 def load_last_location():
     global current_city, last_logged_city
     try:
@@ -130,21 +117,22 @@ def load_last_location():
         logging.error(f"Error loading last location: {e}")
 
 
-# Function to save price data to the database
-def save_price_data(unique_name, city, price):
+# Function to send price data to the server
+def send_price_data(unique_name, city, price):
     try:
-        # Check if the item already exists
-        item = session.query(Item).filter_by(unique_name=unique_name).first()
-        if not item:
-            logging.info(f"Item {unique_name} not found in database, skipping price save.")
-            return
-
-        # Add price data
-        price_data = Price(item_id=item.id, city=city, price=price, last_updated=datetime.now())
-        session.add(price_data)
-        session.commit()
+        url = 'https://quasarex.pythonanywhere.com/update_price'
+        data = {
+            'unique_name': unique_name,
+            'city': city,
+            'price': price
+        }
+        response = requests.post(url, json=data)
+        if response.status_code == 200:
+            logging.info(f"Successfully updated price for {unique_name}")
+        else:
+            logging.error(f"Failed to update price: {response.status_code} - {response.text}")
     except Exception as e:
-        logging.error(f"Error saving price data: {e}")
+        logging.error(f"Error sending price data: {e}")
 
 
 # Function to capture packets continuously in real-time
@@ -160,6 +148,3 @@ def capture_packets():
 
 # Run the packet capture
 capture_packets()
-
-# Close the database session when done
-session.close()
