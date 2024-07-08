@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 ${data.ingredients.map(ingredient => `
                                                     <tr class="ingredient-row" data-ingredient="${ingredient.unique_name}">
                                                         <td>${ingredient.quantity} x <img src="https://render.albiononline.com/v1/item/${ingredient.unique_name}" alt="${ingredient.name}" class="ingredient-image">${ingredient.name}</td>
-                                                        <td><input type="number" class="ingredient-quantity" value="${ingredient.quantity}" readonly min="0"></td>
+                                                        <td><input type="number" class="ingredient-quantity" value="${ingredient.quantity}" min="0"></td>
                                                         <td><input type="number" class="ingredient-have" value="0" min="0"></td>
                                                         <td><input type="number" class="ingredient-total" value="0" readonly></td>
                                                         <td><input type="number" class="ingredient-silver" value="0" readonly></td>
@@ -163,17 +163,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Fetch prices for ingredients
                 fetchIngredientPrices(data.ingredients);
 
-                // Fetch the latest price
+                // Fetch the minimum price for the main item
                 fetch(`/item_prices/${unique_name}`)
                     .then(response => response.json())
                     .then(data => {
                         let pricesArray = Object.values(data).flat();
                         if (pricesArray.length > 0) {
-                            let latestPrice = pricesArray.reduce((prev, curr) => {
-                                return new Date(prev.last_updated) > new Date(curr.last_updated) ? prev : curr;
+                            let minPrice = pricesArray.reduce((prev, curr) => {
+                                return prev.price < curr.price ? prev : curr;
                             });
-                            console.log(latestPrice.price);
-                            document.getElementById('market-price').innerText = latestPrice.price;
+                            console.log(minPrice.price);
+                            document.getElementById('market-price').innerText = minPrice.price;
                         } else {
                             document.getElementById('market-price').innerText = 'No price data';
                         }
@@ -245,11 +245,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(data => {
                     let pricesArray = Object.values(data).flat();
                     if (pricesArray.length > 0) {
-                        let latestPrice = pricesArray.reduce((prev, curr) => {
-                            return new Date(prev.last_updated) > new Date(curr.last_updated) ? prev : curr;
+                        let minPrice = pricesArray.reduce((prev, curr) => {
+                            return prev.price < curr.price ? prev : curr;
                         });
                         // Store ingredient price in global prices object
-                        prices[ingredient.unique_name] = latestPrice.price;
+                        prices[ingredient.unique_name] = minPrice.price;
                     } else {
                         prices[ingredient.unique_name] = 0; // Default to 0 if no price data found
                     }
