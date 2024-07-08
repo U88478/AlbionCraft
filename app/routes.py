@@ -140,13 +140,13 @@ def update_price():
     if not unique_name or not city or price is None:
         return jsonify({'error': 'Missing data'}), 400
 
-    item = Item.query.filter_by(unique_name=unique_name).first()
+    item = session.query(Item).filter_by(unique_name=unique_name).first()
     if not item:
         return jsonify({'error': f'Item {unique_name} not found'}), 404
 
     price_data = Price(item_id=item.id, city=city, price=price, last_updated=datetime.now())
-    db.session.add(price_data)
-    db.session.commit()
+    session.add(price_data)
+    session.commit()
 
     return jsonify({'success': 'Price updated successfully'}), 200
 
