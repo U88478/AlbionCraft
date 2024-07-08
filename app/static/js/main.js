@@ -160,18 +160,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     input.addEventListener('input', updateCalculator);
                 });
 
-                updateCalculator();
-
-                // Initialize the graph
-                fetchItemPrices(unique_name);
+                // Fetch prices for ingredients
+                fetchIngredientPrices(data.ingredients);
 
                 // Fetch the latest price
                 fetch(`/item_prices/${unique_name}`)
                     .then(response => response.json())
                     .then(data => {
-                        let prices = Object.values(data).flat();
-                        if (prices.length > 0) {
-                            let latestPrice = prices.reduce((prev, curr) => {
+                        let pricesArray = Object.values(data).flat();
+                        if (pricesArray.length > 0) {
+                            let latestPrice = pricesArray.reduce((prev, curr) => {
                                 return new Date(prev.last_updated) > new Date(curr.last_updated) ? prev : curr;
                             });
                             console.log(latestPrice.price);
@@ -184,6 +182,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.error('Error fetching item price:', error);
                         document.getElementById('market-price').innerText = 'Error fetching price';
                     });
+
+                updateCalculator();
+                fetchItemPrices(unique_name);
             });
     }
 
@@ -235,6 +236,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
             });
+    }
+
+    function fetchIngredientPrices(ingredients) {
+        ingredients.forEach(ingredient => {
+            fetch(`/item_prices/${ingredient.unique_name}`)
+                .then(response => response.json())
+                .then(data => {
+                    let pricesArray = Object.values(data).flat();
+                    if (pricesArray.length > 0) {
+                        let latestPrice = pricesArray.reduce((prev, curr) => {
+                            return new Date(prev.last_updated) > new Date(curr.last_updated) ? prev : curr;
+                        });
+                        // Store ingredient price in global prices object
+                        prices[ingredient.unique_name] = latestPrice.price;
+                    } else {
+                        prices[ingredient.unique_name] = 0; // Default to 0 if no price data found
+                    }
+                    updateCalculator(); // Update calculator after fetching ingredient price
+                })
+                .catch(error => {
+                    console.error(`Error fetching price for ${ingredient.unique_name}:`, error);
+                    prices[ingredient.unique_name] = 0; // Default to 0 if there's an error
+                });
+        });
     }
 
     function getItemPrice(unique_name) {
