@@ -2,8 +2,8 @@ import json
 import re
 from datetime import datetime
 
+import requests
 from flask import Flask, render_template, request, jsonify, Blueprint
-from sqlalchemy.orm import joinedload
 
 from app.extensions import db
 from models.models import Item, Price
@@ -32,14 +32,10 @@ def search_items():
 @bp.route('/item/<unique_name>')
 def item_details(unique_name):
     item = session.query(Item).filter_by(unique_name=unique_name).first()
-
-    # Handle the case where the exact item (including enchantment level) is not found
     if not item:
         return jsonify({'error': 'Item not found'}), 404
 
     ingredients = []
-
-    # Try to get the ingredients for the exact item first
     if item.ingredients:
         try:
             item_ingredients = json.loads(item.ingredients)
@@ -49,10 +45,8 @@ def item_details(unique_name):
     else:
         item_ingredients = []
 
-    # Prepare ingredients data for response
     for ingredient in item_ingredients:
         ingredient_unique_name = ingredient['ingredient']
-        print(ingredient_unique_name)
         ingredient_quantity = ingredient['quantity']
         ingredient_item = session.query(Item).filter_by(unique_name=ingredient_unique_name).first()
         if ingredient_item:
@@ -62,9 +56,6 @@ def item_details(unique_name):
                 'unique_name': ingredient_unique_name
             })
 
-        print(ingredients)
-
-    # Get similar items
     general_item = re.sub(r"(T\d_)|(_LEVEL\d)|(@\d)", "", item.unique_name)
     similar_items = session.query(Item).filter(Item.unique_name.contains(general_item)).all()
 
@@ -74,32 +65,6 @@ def item_details(unique_name):
         'similar_items': [sim_item.to_dict() for sim_item in similar_items]
     }
     return jsonify(data)
-
-
-@bp.route('/calculate_craft', methods=['POST'])
-def calculate_craft():
-    data = request.get_json()
-    unique_name = data.get('unique_name')
-    quantity = int(data.get('quantity', 1))
-    item = session.query(Item).filter_by(unique_name=unique_name).first_or_404()
-    ingredients = []
-    total_cost = 0
-    if item.ingredients:
-        item_ingredients = json.loads(item.ingredients)
-        for ingredient in item_ingredients:
-            ingredient_unique_name = ingredient['ingredient']
-            ingredient_quantity = ingredient['quantity'] * quantity
-            ingredient_item = session.query(Item).filter_by(unique_name=ingredient_unique_name).first()
-            if ingredient_item:
-                ingredient_cost = get_item_price(ingredient_unique_name) * ingredient_quantity
-                total_cost += ingredient_cost
-                ingredients.append({
-                    'name': ingredient_item.en_name,
-                    'quantity': ingredient_quantity,
-                    'unique_name': ingredient_unique_name,
-                    'cost': ingredient_cost
-                })
-    return jsonify({'ingredients': ingredients, 'total_cost': total_cost})
 
 
 @bp.route('/popular_items')
@@ -112,22 +77,65 @@ def popular_items():
 def get_item_price(unique_name):
     item = session.query(Item).filter_by(unique_name=unique_name).first()
     if item and item.prices:
-        return item.prices[-1].price  # Return the latest price
+        return item.prices[-1].price
     return 0
 
 
-@bp.route('/item_prices/<unique_name>')
-def item_prices(unique_name):
-    item = session.query(Item).filter_by(unique_name=unique_name).options(joinedload(Item.prices)).first_or_404()
+@bp.route('/item_prices/<unique_name>', methods=['GET'])
+def get_item_prices(unique_name):
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    city = request.args.get('city')
+
+    query = session.query(Price).join(Item).filter(Item.unique_name == unique_name)
+    if start_date:
+        query = query.filter(Price.last_updated >= start_date)
+    if end_date:
+        query = query.filter(Price.last_updated <= end_date)
+    if city:
+        query = query.filter(Price.city == city)
+
+    prices = query.order_by(Price.last_updated).all()
     prices_by_city = {}
-    for price in item.prices:
+    for price in prices:
         if price.city not in prices_by_city:
             prices_by_city[price.city] = []
         prices_by_city[price.city].append(price.to_dict())
 
-    print(f"Fetched prices for {unique_name}: {prices_by_city}")
-
     return jsonify(prices_by_city)
+
+
+def fetch_current_prices(unique_name, cities):
+    url = f"https://west.albion-online-data.com/api/v2/stats/prices/{unique_name}.json?locations={','.join(cities)}"
+    response = requests.get(url)
+    return response.json()
+
+
+def store_prices(unique_name, current_prices_data):
+    item = session.query(Item).filter_by(unique_name=unique_name).first()
+    if not item:
+        return
+
+    for entry in current_prices_data:
+        if 'sell_price_min' in entry and entry['sell_price_min'] > 0:
+            new_price = Price(
+                item_id=item.id,
+                city=entry['city'],
+                price=entry['sell_price_min'],
+                last_updated=datetime.strptime(entry['sell_price_min_date'], '%Y-%m-%dT%H:%M:%S')
+            )
+            session.add(new_price)
+    session.commit()
+
+
+@bp.route('/fetch_prices/<unique_name>')
+def fetch_prices(unique_name):
+    cities = ['Caerleon', 'Bridgewatch', 'Lymhurst', 'Martlock', 'Thetford', 'Fort Sterling']
+
+    current_prices = fetch_current_prices(unique_name, cities)
+    store_prices(unique_name, current_prices)
+
+    return jsonify({'message': 'Prices fetched and stored successfully'})
 
 
 @bp.route('/update_price', methods=['POST'])
@@ -155,3 +163,7 @@ def update_price():
 
 
 app.register_blueprint(bp)
+
+if __name__ == '__main__':
+    with app.app_context():
+        app.run(debug=True)
