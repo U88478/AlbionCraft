@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Global prices object to store item prices
     const prices = {};
 
     const searchInput = document.getElementById('search-input');
@@ -13,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fetch(`/search?query=${query}`)
                 .then(response => response.json())
                 .then(data => {
-                    searchResultsDiv.innerHTML = ''; // Clear previous results
+                    searchResultsDiv.innerHTML = '';
                     data.items.forEach(item => {
                         const itemElement = document.createElement('div');
                         itemElement.classList.add('search-result-item');
@@ -23,22 +22,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         `;
                         itemElement.addEventListener('click', function() {
                             loadItemDetails(item.unique_name);
-                            searchResultsDiv.innerHTML = ''; // Clear results after selection
+                            searchResultsDiv.innerHTML = '';
                         });
                         searchResultsDiv.appendChild(itemElement);
                     });
                 });
         } else {
-            searchResultsDiv.innerHTML = ''; // Clear results if query is too short
+            searchResultsDiv.innerHTML = '';
         }
     });
 
-    // Ensure loadItemDetails is in the global scope
     window.loadItemDetails = function(unique_name) {
         fetch(`/item/${unique_name}`)
             .then(response => response.json())
             .then(data => {
-                contentDiv.innerHTML = ''; // Clear previous content
+                contentDiv.innerHTML = '';
                 const itemDetails = document.createElement('div');
                 itemDetails.classList.add('item-details');
                 itemDetails.innerHTML = `
@@ -48,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="similar-items-grid">
                                 ${data.similar_items.map(similarItem => `
                                     <div class="similar-item">
-                                        <a href="#" onclick="loadItemDetails('${similarItem.unique_name}')">
+                                        <a class="no-styling-link" href="#" onclick="loadItemDetails('${similarItem.unique_name}'); return false;">
                                             <img src="https://render.albiononline.com/v1/item/${similarItem.unique_name}" alt="${similarItem.en_name}">
-                                            <p>${similarItem.en_name}</p>
+                                            <p class="similar-item-text">${similarItem.en_name}</p>
                                         </a>
                                     </div>
                                 `).join('')}
@@ -99,11 +97,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     <th>Quantity</th>
                                                     <th>Fame</th>
                                                     <th>Return rate %</th>
+                                                    <th>Item Price</th>
                                                 </tr>
                                                 <tr>
                                                     <td><input type="number" id="craft-quantity" value="1" min="1"></td>
                                                     <td><input type="number" id="fame-per-item" value="0" min="0"></td>
                                                     <td><input type="number" id="return-rate" value="0" min="0" max="100"></td>
+                                                    <td><input type="number" id="item-price" value="0" min="0"></td>
                                                 </tr>
                                             </table>
                                             <br>
@@ -116,14 +116,16 @@ document.addEventListener('DOMContentLoaded', function() {
                                                     <th>Needed</th>
                                                     <th>Available</th>
                                                     <th>Total</th>
+                                                    <th>Price per unit</th>
                                                     <th>Total silver</th>
                                                 </tr>
                                                 ${data.ingredients.map(ingredient => `
                                                     <tr class="ingredient-row" data-ingredient="${ingredient.unique_name}">
-                                                        <td>${ingredient.quantity} x <img src="https://render.albiononline.com/v1/item/${ingredient.unique_name}" alt="${ingredient.name}" class="ingredient-image">${ingredient.name}</td>
+                                                        <td>${ingredient.quantity} x <img src="https://render.albiononline.com/v1/item/${ingredient.unique_name}" alt="${ingredient.name}" class="ingredient-image"> ${ingredient.name}</td>
                                                         <td><input type="number" class="ingredient-quantity" value="${ingredient.quantity}" min="0"></td>
                                                         <td><input type="number" class="ingredient-have" value="0" min="0"></td>
                                                         <td><input type="number" class="ingredient-total" value="0" readonly></td>
+                                                        <td><input type="number" class="ingredient-price" value="0" min="0"></td>
                                                         <td><input type="number" class="ingredient-silver" value="0" readonly></td>
                                                     </tr>
                                                 `).join('')}
@@ -152,89 +154,76 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
                 contentDiv.appendChild(itemDetails);
 
-                // Add event listeners for the calculator inputs
                 document.getElementById('craft-quantity').addEventListener('input', updateCalculator);
                 document.getElementById('fame-per-item').addEventListener('input', updateCalculator);
                 document.getElementById('return-rate').addEventListener('input', updateCalculator);
                 document.querySelectorAll('.ingredient-have').forEach(input => {
                     input.addEventListener('input', updateCalculator);
                 });
+                document.querySelectorAll('.ingredient-price').forEach(input => {
+                    input.addEventListener('input', updateCalculator);
+                });
 
-                // Fetch prices for ingredients
                 fetchIngredientPrices(data.ingredients);
 
-                // Fetch the minimum price for the main item
-                fetch(`/item_prices/${unique_name}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        let pricesArray = Object.values(data).flat();
-                        if (pricesArray.length > 0) {
-                            let minPrice = pricesArray.reduce((prev, curr) => {
-                                return prev.price < curr.price ? prev : curr;
-                            });
-                            console.log(minPrice.price);
-                            document.getElementById('market-price').innerText = minPrice.price;
-                        } else {
-                            document.getElementById('market-price').innerText = 'No price data';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching item price:', error);
-                        document.getElementById('market-price').innerText = 'Error fetching price';
-                    });
+                fetchItemPrices(unique_name);
 
                 updateCalculator();
-                fetchItemPrices(unique_name);
             });
     }
 
     function fetchItemPrices(unique_name) {
         fetch(`/item_prices/${unique_name}`)
             .then(response => response.json())
-            .then(data => {
-                // Store prices in global object
-                Object.keys(data).forEach(city => {
-                    data[city].forEach(priceData => {
-                        prices[priceData.city] = priceData.price;
-                    });
-                });
-
-                const graphsContainer = document.getElementById('market-graphs-container');
-                graphsContainer.innerHTML = ''; // Clear previous graphs
-
-                Object.keys(data).forEach(city => {
-                    const cityData = data[city];
-                    const canvas = document.createElement('canvas');
-                    graphsContainer.appendChild(canvas);
-
-                    const ctx = canvas.getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: cityData.map(entry => entry.last_updated),
-                            datasets: [{
-                                label: `${city} Prices`,
-                                data: cityData.map(entry => entry.price),
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                x: {
-                                    type: 'time',
-                                    time: {
-                                        unit: 'day'
-                                    }
-                                },
-                                y: {
-                                    beginAtZero: true
-                                }
-                            }
+            .then(dbData => {
+                if (typeof dbData !== 'object' || Array.isArray(dbData)) {
+                    console.error(`Invalid DB response for ${unique_name}:`, dbData);
+                    return;
+                }
+                const apiUrl = `https://west.albion-online-data.com/api/v2/stats/prices/${unique_name}`;
+                fetch(apiUrl)
+                    .then(apiResponse => apiResponse.json())
+                    .then(apiData => {
+                        console.log(`API data for ${unique_name}:`, apiData); // Log the API response
+                        if (!Array.isArray(apiData)) {
+                            console.error(`Invalid API response for ${unique_name}:`, apiData);
+                            return;
                         }
+
+                        let combinedData = [];
+
+                        // Flatten the dbData object into an array
+                        Object.keys(dbData).forEach(city => {
+                            combinedData = combinedData.concat(dbData[city]);
+                        });
+
+                        combinedData = combinedData.concat(apiData);
+
+                        let pricesArray = combinedData.filter(price => price.sell_price_min > 0);
+                        if (pricesArray.length > 0) {
+                            let minPrice = pricesArray.reduce((prev, curr) => {
+                                return prev.sell_price_min < curr.sell_price_min ? prev : curr;
+                            });
+                            document.getElementById('market-price').innerText = minPrice.sell_price_min;
+                            document.getElementById('item-price').value = minPrice.sell_price_min;
+
+                            // Save API prices to DB
+                            saveApiPricesToDB(unique_name, apiData);
+                        } else {
+                            document.getElementById('market-price').innerText = 'No price data';
+                            document.getElementById('item-price').value = 0;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error fetching API price for ${unique_name}:`, error);
+                        document.getElementById('market-price').innerText = 'Error fetching price';
+                        document.getElementById('item-price').value = 0;
                     });
-                });
+            })
+            .catch(error => {
+                console.error('Error fetching DB price:', error);
+                document.getElementById('market-price').innerText = 'Error fetching price';
+                document.getElementById('item-price').value = 0;
             });
     }
 
@@ -242,48 +231,106 @@ document.addEventListener('DOMContentLoaded', function() {
         ingredients.forEach(ingredient => {
             fetch(`/item_prices/${ingredient.unique_name}`)
                 .then(response => response.json())
-                .then(data => {
-                    let pricesArray = Object.values(data).flat();
-                    if (pricesArray.length > 0) {
-                        let minPrice = pricesArray.reduce((prev, curr) => {
-                            return prev.price < curr.price ? prev : curr;
-                        });
-                        // Store ingredient price in global prices object
-                        prices[ingredient.unique_name] = minPrice.price;
-                    } else {
-                        prices[ingredient.unique_name] = 0; // Default to 0 if no price data found
+                .then(dbData => {
+                    if (typeof dbData !== 'object' || Array.isArray(dbData)) {
+                        console.error(`Invalid DB response for ${ingredient.unique_name}:`, dbData);
+                        return;
                     }
-                    updateCalculator(); // Update calculator after fetching ingredient price
+                    const apiUrl = `https://west.albion-online-data.com/api/v2/stats/prices/${ingredient.unique_name}`;
+                    fetch(apiUrl)
+                        .then(apiResponse => apiResponse.json())
+                        .then(apiData => {
+                            console.log(`API data for ${ingredient.unique_name}:`, apiData); // Log the API response
+                            if (!Array.isArray(apiData)) {
+                                console.error(`Invalid API response for ${ingredient.unique_name}:`, apiData);
+                                return;
+                            }
+
+                            let combinedData = [];
+
+                            // Flatten the dbData object into an array
+                            Object.keys(dbData).forEach(city => {
+                                combinedData = combinedData.concat(dbData[city]);
+                            });
+
+                            combinedData = combinedData.concat(apiData);
+
+                            let pricesArray = combinedData.filter(price => price.sell_price_min > 0);
+                            if (pricesArray.length > 0) {
+                                let minPrice = pricesArray.reduce((prev, curr) => {
+                                    return prev.sell_price_min < curr.sell_price_min ? prev : curr;
+                                });
+                                document.querySelector(`.ingredient-row[data-ingredient="${ingredient.unique_name}"] .ingredient-price`).value = minPrice.sell_price_min;
+                                prices[ingredient.unique_name] = minPrice.sell_price_min;
+
+                                // Save API prices to DB
+                                saveApiPricesToDB(ingredient.unique_name, apiData);
+                            } else {
+                                document.querySelector(`.ingredient-row[data-ingredient="${ingredient.unique_name}"] .ingredient-price`).value = 0;
+                                prices[ingredient.unique_name] = 0;
+                            }
+                            updateCalculator();
+                        })
+                        .catch(error => {
+                            console.error(`Error fetching API price for ${ingredient.unique_name}:`, error);
+                            prices[ingredient.unique_name] = 0;
+                        });
                 })
                 .catch(error => {
-                    console.error(`Error fetching price for ${ingredient.unique_name}:`, error);
-                    prices[ingredient.unique_name] = 0; // Default to 0 if there's an error
+                    console.error(`Error fetching DB price for ${ingredient.unique_name}:`, error);
+                    prices[ingredient.unique_name] = 0;
                 });
         });
     }
 
-    function getItemPrice(unique_name) {
-        // Fetch the item price from the global prices object
-        return prices[unique_name] || 0;
+    function saveApiPricesToDB(unique_name, apiData) {
+        apiData.forEach(priceData => {
+            if (priceData.sell_price_min > 0) {
+                const postData = {
+                    unique_name: priceData.item_id,
+                    city: priceData.city,
+                    price: priceData.sell_price_min
+                };
+                fetch('/update_price', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(postData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log(`Price for ${unique_name} in ${priceData.city} updated successfully.`);
+                    } else {
+                        console.error(`Error updating price for ${unique_name} in ${priceData.city}:`, data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error updating price for ${unique_name} in ${priceData.city}:`, error);
+                });
+            }
+        });
     }
 
     function updateCalculator() {
         const quantity = parseInt(document.getElementById('craft-quantity').value, 10);
         const fame = parseInt(document.getElementById('fame-per-item').value, 10);
         const returnRate = parseInt(document.getElementById('return-rate').value, 10);
-        const itemValue = parseInt(document.getElementById('market-price').innerText, 10);
+        const itemValue = parseInt(document.getElementById('item-price').value, 10);
 
         let totalSilver = 0;
 
         document.querySelectorAll('.ingredient-row').forEach(row => {
             const neededQuantity = parseInt(row.querySelector('.ingredient-quantity').value, 10) * quantity;
             const haveQuantity = parseInt(row.querySelector('.ingredient-have').value, 10);
+            const UnitPrice = parseInt(row.querySelector('.ingredient-price').value, 10);
             const totalRequired = row.querySelector('.ingredient-total');
             const ingredientName = row.dataset.ingredient;
 
             const returnAmount = Math.floor(neededQuantity * (returnRate / 100));
             const Needed = Math.max(neededQuantity - haveQuantity - returnAmount, 0);
-            const silverCost = getItemPrice(ingredientName) * Needed;
+            const silverCost = UnitPrice * Needed;
 
             totalRequired.value = Needed;
 
@@ -300,15 +347,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('profit-silver').value = itemValue - totalSilver;
     }
 
-    // Initial load of popular items
     fetch('/popular_items')
         .then(response => response.json())
         .then(data => {
             popularItemsList.innerHTML = data.items.map(item => `
                 <div class="popular-item">
-                    <a href="#" onclick="loadItemDetails('${item.unique_name}')">
+                    <a class="no-styling-link" href="#" onclick="loadItemDetails('${item.unique_name}'); return false;">
                         <img src="https://render.albiononline.com/v1/item/${item.unique_name}" alt="${item.en_name}">
-                        <p>${item.en_name}</p>
+                        <p class="popular-item-text">${item.en_name}</p>
                     </a>
                 </div>
             `).join('');

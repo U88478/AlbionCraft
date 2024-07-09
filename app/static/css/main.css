@@ -154,7 +154,6 @@ header h1 {
     flex-wrap: wrap;
 }
 
-
 .similar-item {
     width: 100px;
     text-align: center;
@@ -164,6 +163,15 @@ header h1 {
 .similar-item img {
     width: 80px;
     height: 80px;
+}
+
+.similar-item-text {
+    color: #FBFFFE;
+    text-decoration: none;
+}
+
+.similar-item-text:hover {
+    text-decoration: underline;
 }
 
 .item-main-content {
@@ -244,6 +252,15 @@ header h1 {
 .ingredient-item {
     display: flex;
     align-items: center;
+}
+
+.ingredient-link {
+    color: #FBFFFE;
+    text-decoration: none;
+}
+
+.ingredient-link:hover {
+    text-decoration: underline;
 }
 
 .tab-header {
