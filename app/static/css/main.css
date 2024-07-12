@@ -122,6 +122,11 @@ header h1 {
     margin-bottom: 5px;
 }
 
+p.popular-item-text {
+    color: #FBFFFE;
+    text-decoration: none;
+}
+
 .item-details .item-container {
     display: flex;
     justify-content: space-between;
