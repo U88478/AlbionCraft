@@ -20,10 +20,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             <img src="https://render.albiononline.com/v1/item/${item.unique_name}" alt="${item.en_name}">
                             <span>${item.en_name}</span>
                         `;
-                        itemElement.addEventListener('click', function() {
-                            loadItemDetails(item.unique_name);
-                            searchResultsDiv.innerHTML = '';
-                        });
+                        itemElement.innerHTML = `
+                            <a href="/item/${item.unique_name}" class="no-styling-link">
+                                <img src="https://render.albiononline.com/v1/item/${item.unique_name}" alt="${item.en_name}">
+                                <span>${item.en_name}</span>
+                            </a>
+                        `;
                         searchResultsDiv.appendChild(itemElement);
                     });
                 });
@@ -72,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <p>Unique Name: ${data.item.unique_name}</p>
                                         <p>Tier: ${data.item.tier}</p>
                                         <p>Set: ${data.item.set}</p>
-                                        <p>Item Power: ${data.item.item_power}</p>
+                                        <p>Base Item Power: ${data.item.item_power}</p>
                                         <p>Enchantment Level: ${data.item.enchantment_level}</p>
                                     </div>
                                     <div id="ingredients-list" class="tab-content active">
@@ -345,6 +347,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('total-silver').value = totalSilver;
         document.getElementById('total-fame').value = fame * quantity;
         document.getElementById('profit-silver').value = itemValue - totalSilver;
+        console.log(`itemValue ${itemValue}`);
+        console.log(`totalSilver ${totalSilver}`);
     }
 
     fetch('/popular_items')
@@ -352,7 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             popularItemsList.innerHTML = data.items.map(item => `
                 <div class="popular-item">
-                    <a class="no-styling-link" href="#" onclick="loadItemDetails('${item.unique_name}'); return false;">
+                    <a href="/item/${item.unique_name}" class="no-styling-link">
                         <img src="https://render.albiononline.com/v1/item/${item.unique_name}" alt="${item.en_name}">
                         <p class="popular-item-text">${item.en_name}</p>
                     </a>

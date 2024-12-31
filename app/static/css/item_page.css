@@ -1,0 +1,311 @@
+/* Updated CSS to Correct Layout Issues */
+
+/* General body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #17183B;
+    color: #FBFFFE;
+}
+
+/* Header section */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: #1B1B1E;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+header h1 {
+    margin: 0;
+}
+
+header .logo {
+    margin-right: 20px;
+}
+
+/* Search Bar Section */
+.search-bar {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    background-color: #1B1B1E;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.search-bar input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    margin-right: 10px;
+    width: 300px;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    background-color: #1E73BF;
+    color: #FBFFFE;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-bar button:hover {
+    background-color: #155a90;
+}
+
+
+/* Item container and main content */
+.item-container {
+    display: flex;
+    margin: 20px;
+}
+
+/* Similar items section */
+.similar-items {
+    border-radius: 10px 0 0 10px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.similar-items h3 {
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 18px;
+    color: #FAA916;
+}
+
+.similar-items-grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.similar-item {
+    width: 100px;
+    text-align: center;
+    margin: 10px;
+}
+
+.similar-item img {
+    width: 80px;
+    height: 80px;
+}
+
+.similar-item-text {
+    color: #FBFFFE;
+    text-decoration: none;
+}
+
+.similar-item-text:hover {
+    text-decoration: underline;
+}
+
+/* Main content styling */
+.item-main-content {
+    flex: 2;
+    padding: 20px;
+    background-color: #1B1B1E;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.item-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.item-header .item-image {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+    border-radius: 5px;
+}
+
+.item-info h2 {
+    margin: 0;
+    color: #FAA916;
+    font-size: 22px;
+}
+
+.item-info p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+/* Details section */
+.details-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: stretch
+}
+
+.details-container .tab-content {
+    background-color: #333;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 5px;
+    flex: 1; /* Ensures equal width for both sections */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    margin-bottom: 40px;
+}
+
+.tab-header {
+    background-color: #FAA916;
+    border-radius: 5px 5px 0 0;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: #17183B;
+}
+
+.tab-title {
+    color: #17183B;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* Calculator section */
+#calculator-header {
+    background-color: #14ADE5;
+}
+
+.calculator {
+    background-color: #1B1B1E;
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+
+#regular-mode, #matrix-solver-mode {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+#regular-mode label, #matrix-solver-mode label {
+    margin: 10px 0 5px;
+}
+
+#regular-mode input, #matrix-solver-mode input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    margin-bottom: 10px;
+    width: 60px;
+}
+
+#regular-mode button, #matrix-solver-mode button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #FAA916;
+    color: #17183B;
+    border: none;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+#regular-mode button:hover, #matrix-solver-mode button:hover {
+    background-color: #FFD700;
+    color: #17183B;
+}
+
+#total-cost, #craftable-items, #total-fame {
+    font-weight: bold;
+}
+
+.ingredient-image {
+    width: 40px;
+    height: 40px;
+    vertical-align: middle; /* Ensures the image is vertically aligned in the middle of the text */
+}
+
+.calculator-content {
+    background-color: #333;
+    padding: 20px;
+    border: 1px solid #333;
+    border-radius: 0 5px 5px 5px;
+}
+
+/* Custom Styles */
+.table th, .table td {
+    border-color: #444;
+}
+
+.table thead th {
+    background-color: #333;
+}
+
+.table td img {
+    width: 40px;
+    height: 40px;
+}
+
+.total-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.total-display span {
+    flex: 1;
+}
+
+.total-display input {
+    flex: 2;
+    margin-left: 10px;
+}
+
+#header-table, #ingredient-table{
+    border-collapse: collapse;
+}
+
+.tb1 {
+    text-align: right;
+}
+
+#header-table {
+    width:60%;
+}
+
+#ingredient-header th {
+    text-align: left;
+}
+
+.total-label {
+    text-align: left;
+    padding-right: 20px;
+}
+
+#craft-quantity, #fame-per-item, #return-rate {
+    text-align: right;
+}
+
+/* Market graph section */
+.market-graph {
+    border-radius: 0 10px 10px 0;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.market-graph h3 {
+    text-align: center;
+    color: #FAA916;
+}
+
+.similar-items, .market-graph {
+    flex: 1;
+    background-color: rgb(0 0 0 / 30%);
+}

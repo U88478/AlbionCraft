@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Details</title>
+    <link rel="stylesheet" href="/static/css/item_page.css">
+    <script>
+        const itemData = {{ item_data | tojson }};
+    </script>
+    <script src="/static/js/item_page.js" defer></script>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <img src="/static/icons/favicon-32x32.png" alt="Logo">
+    </div>
+    <h1>Albion Crafting Calculator</h1>
+</header>
+
+<div class="search-bar">
+    <input type="text" id="search-input" placeholder="Search for items...">
+    <div id="search-results" class="search-results"></div>
+</div>
+
+<div class="item-container">
+    <div class="similar-items">
+        <h3>Similar Items</h3>
+        <div id="similar-items-grid" class="similar-items-grid">
+            {% for similar_item in similar_items %}
+            <div class="similar-item">
+                <a href="/item/{{ similar_item.unique_name }}">
+                    <img src="{{ similar_item.icon_url }}" alt="{{ similar_item.en_name }}">
+                    <div class="similar-item-text">{{ similar_item.en_name }}</div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="item-main-content">
+        <div class="item-header">
+            <img id="item-image" src="#" alt="Item Image" class="item-image">
+            <div class="item-info">
+                <h2 id="item-name">Item Name</h2>
+                <p id="item-value">Estimated Market Price: <span id="market-price">loading...</span></p>
+            </div>
+        </div>
+        <div class="section-div">
+            <div class="tab-header">
+                <div class="tab-title">Details</div>
+            </div>
+            <div class="details-container">
+                <div id="details" class="tab-content active">
+                    <h3>Details:</h3>
+                    <p id="item-unique-name">Unique Name: </p>
+                    <p id="item-tier">Tier: </p>
+                    <p id="item-set">Set: </p>
+                    <p id="item-power">Base Item Power: </p>
+                    <p id="item-enchantment">Enchantment Level: </p>
+                </div>
+                <div id="ingredients-list" class="tab-content active">
+                    <h3>Ingredients:</h3>
+                    <ul id="ingredient-list">
+                        {% for ingredient in ingredients %}
+                        <li>{{ ingredient.quantity }} x <a href="/item/{{ ingredient.unique_name }}">{{ ingredient.name
+                            }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section-div">
+            <div id="calculator-header" class="tab-header">
+                <div class="tab-title">Calculator</div>
+            </div>
+            <div id="calculator">
+                <div id="calculator-mode">
+                    <div id="regular-mode" class="calculator-content active">
+                        <table id="header-table">
+                            <tr>
+                                <th>Quantity</th>
+                                <th>Fame</th>
+                                <th>Return rate %</th>
+                                <th>Item Price</th>
+                            </tr>
+                            <tr>
+                                <td><input type="number" id="craft-quantity" value="1" min="1"></td>
+                                <td><input type="number" id="fame-per-item" value="0" min="0"></td>
+                                <td><input type="number" id="return-rate" value="0" min="0" max="100"></td>
+                                <td><input type="number" id="item-price" value="0" min="0"></td>
+                            </tr>
+                        </table>
+                        <table id="ingredient-table">
+                            <tr id="ingredient-header">
+                                <th>Ingredients</th>
+                                <th>Per item</th>
+                                <th>Available</th>
+                                <th>Total</th>
+                                <th>Price per unit</th>
+                                <th>Total silver</th>
+                            </tr>
+                            <!-- Ingredient rows will be dynamically injected here -->
+                            <tr>
+                                <td class="total-label">Total silver</td>
+                                <td colspan="2"><input type="number" id="total-silver" readonly></td>
+                                <td class="profit-label">Profit</td>
+                                <td><input type="number" id="profit-silver" readonly></td>
+                            </tr>
+                            <tr>
+                                <td class="total-label">Total fame</td>
+                                <td colspan="2"><input type="number" id="total-fame" readonly></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="market-graph">
+        <h3>Market Trends</h3>
+        <div id="market-graphs-container"></div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -29,18 +29,18 @@ def search_items():
     return jsonify(data)
 
 
-@bp.route('/item/<unique_name>')
-def item_details(unique_name):
+def fetch_item_data(unique_name):
     item = session.query(Item).filter_by(unique_name=unique_name).first()
+    print('aaaaaaaaaaaaaaaaaaaaaa')
     if not item:
-        return jsonify({'error': 'Item not found'}), 404
+        return
 
+    # Prepare item details
     ingredients = []
     if item.ingredients:
         try:
             item_ingredients = json.loads(item.ingredients)
-        except (json.JSONDecodeError, TypeError) as e:
-            print(f"JSON decode error or Type error: {e}")
+        except (json.JSONDecodeError, TypeError):
             item_ingredients = []
     else:
         item_ingredients = []
@@ -59,12 +59,34 @@ def item_details(unique_name):
     general_item = re.sub(r"(T\d_)|(_LEVEL\d)|(@\d)", "", item.unique_name)
     similar_items = session.query(Item).filter(Item.unique_name.contains(general_item)).all()
 
-    data = {
-        'item': item.to_dict(),
+    # Return item data
+    item_data = {
+        'unique_name': item.unique_name,
+        'en_name': item.en_name,
+        'tier': item.tier,
+        'set': item.set,
+        'item_power': item.item_power,
+        'enchantment_level': item.enchantment_level,
         'ingredients': ingredients,
-        'similar_items': [sim_item.to_dict() for sim_item in similar_items]
+        'similar_items': [
+            {'unique_name': si.unique_name, 'en_name': si.en_name, 'icon_url': f'https://render.albiononline.com/v1/item/{si.unique_name}'}
+            for si in similar_items
+        ]
     }
-    return jsonify(data)
+
+    return item_data
+
+
+@bp.route('/item/<unique_name>')
+def item_details(unique_name):
+    item_data = fetch_item_data(unique_name)
+    return render_template('item_page.html', item_data=item_data)
+
+
+@bp.route('/api/item/<unique_name>')
+def api_item_details(unique_name):
+    item_data = fetch_item_data(unique_name)
+    return jsonify(item_data)
 
 
 @bp.route('/popular_items')

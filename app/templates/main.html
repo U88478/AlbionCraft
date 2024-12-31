@@ -3,35 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='icons/favicon-16x16.png') }}">
-    <link rel="manifest" href="{{ url_for('static', filename='icons/site.webmanifest') }}">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
     <title>Albion Crafting Calculator</title>
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
-<header>
-    <div class="logo">
-        <img src="{{ url_for('static', filename='icons/favicon-32x32.png') }}" alt="Logo">
-    </div>
-    <h1>Albion Crafting Calculator</h1>
-</header>
-<div class="search-bar">
-    <input type="text" id="search-input" placeholder="Search for items...">
-    <div id="search-results" class="search-results"></div>
-</div>
-<div class="content" id="content">
-    <div class="popular-items">
-        <h3>Popular Items</h3>
-        <div id="popular-items-list" class="grid">
-            <!-- Example popular items (to be dynamically populated) -->
+    <header>
+        <div class="logo">
+            <img src="/static/icons/favicon-32x32.png" alt="Albion Logo">
+            <h1>Albion Crafting Calculator</h1>
         </div>
-    </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    </header>
+
+    <main>
+        <!-- Search Section -->
+        <section class="search-section">
+            <h2>Search for Items</h2>
+            <input type="text" id="search-input" placeholder="Search for items...">
+            <div id="search-results" class="search-results"></div>
+        </section>
+
+        <!-- Featured Items Section -->
+        <section class="featured-items">
+            <h2>Featured Items</h2>
+            <div id="featured-items-grid" class="items-grid">
+                <!-- Featured items will be dynamically populated here -->
+            </div>
+        </section>
+
+        <!-- Additional Info Section -->
+        <section class="info-section">
+            <h2>Welcome to Albion Crafting Calculator</h2>
+            <p>Plan your crafting efficiently, calculate costs, and explore similar items to make informed decisions in Albion Online.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Albion Crafting Calculator. All Rights Reserved.</p>
+    </footer>
+
+    <script src="/static/js/welcome_page.js" defer></script>
 </body>
 </html>
