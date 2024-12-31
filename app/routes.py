@@ -31,7 +31,6 @@ def search_items():
 
 def fetch_item_data(unique_name):
     item = session.query(Item).filter_by(unique_name=unique_name).first()
-    print('aaaaaaaaaaaaaaaaaaaaaa')
     if not item:
         return
 
@@ -59,6 +58,13 @@ def fetch_item_data(unique_name):
     general_item = re.sub(r"(T\d_)|(_LEVEL\d)|(@\d)", "", item.unique_name)
     similar_items = session.query(Item).filter(Item.unique_name.contains(general_item)).all()
 
+    # Fetch latest Bridgewatch price
+    bridgewatch_price = None
+    bridgewatch_prices = [p for p in item.prices if p.city == 'Bridgewatch']
+    if bridgewatch_prices:
+        latest_bridgewatch_entry = max(bridgewatch_prices, key=lambda x: x.last_updated)
+        bridgewatch_price = latest_bridgewatch_entry.price
+
     # Return item data
     item_data = {
         'unique_name': item.unique_name,
@@ -67,6 +73,7 @@ def fetch_item_data(unique_name):
         'set': item.set,
         'item_power': item.item_power,
         'enchantment_level': item.enchantment_level,
+        'price': bridgewatch_price,
         'ingredients': ingredients,
         'similar_items': [
             {'unique_name': si.unique_name, 'en_name': si.en_name, 'icon_url': f'https://render.albiononline.com/v1/item/{si.unique_name}'}

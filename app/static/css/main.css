@@ -1,99 +1,167 @@
-/* General Styling */
+/* General styling */
 body {
     margin: 0;
+    padding: 0;
     font-family: 'Arial', sans-serif;
     background-color: #17183B;
     color: #FBFFFE;
-    line-height: 1.6;
 }
 
+/* Header styling */
 header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 20px;
     background-color: #1B1B1E;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
-header .logo {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+header .logo img {
+    margin-right: 10px;
 }
 
 header h1 {
+    color: #FAA916;
     font-size: 24px;
-    color: #FAA916;
-    margin: 0;
 }
 
-main {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 20px;
+/* Main content styling */
+.main-container {
+    text-align: center;
+    margin-top: 10%;
 }
 
-.search-section,
-.featured-items,
-.info-section {
-    margin-bottom: 30px;
-    padding: 20px;
-    background-color: #1F1F33;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+.welcome-title {
+    font-size: 36px;
+    color: #FBFFFE;
+    margin-bottom: 20px;
 }
 
-.search-section h2,
-.featured-items h2,
-.info-section h2 {
-    color: #FAA916;
-    margin-bottom: 10px;
-}
-
+/* Search bar styling */
 #search-input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #444;
+    width: 30%;
+    padding: 15px;
+    font-size: 16px;
+    border: none;
     border-radius: 5px;
     background-color: #282842;
     color: #FBFFFE;
-    font-size: 16px;
+    outline: none;
+    margin: 0 auto;
+    display: block;
 }
 
+/* Search results container */
 #search-results {
-    margin-top: 10px;
-    background-color: #282842;
+    position: absolute;
+    width: 30%;
+    background-color: #1e1e2e;
     border-radius: 5px;
-    padding: 10px;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px;
 }
 
-.items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 20px;
-}
-
-.items-grid .item {
-    background-color: #282842;
-    border-radius: 5px;
-    text-align: center;
+/* Each search result item */
+.search-result-item {
+    display: flex;
+    align-items: center;
     padding: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    border-bottom: 1px solid #282842;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
 }
 
-.items-grid .item img {
-    max-width: 100px;
-    height: 100px;
-    margin-bottom: 10px;
+.search-result-item:hover {
+    background-color: #3b3b5a;
+    transform: scale(1.02);
+    cursor: pointer;
+}
+
+/* Image inside each result */
+.search-result-item img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
     border-radius: 5px;
 }
 
+/* Item name styling */
+.search-result-item .search-result-name {
+    color: #FBFFFE;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+/* Price display */
+.search-result-item .price-display {
+    font-size: 14px;
+    color: #FBFFFE;
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.price-display img {
+    width: 20px;
+    height: 20px;
+    margin-left: 5px;
+}
+
+/* Fetch price button */
+.search-result-item .fetch-price-button {
+    background-color: #FAA916;
+    color: #1B1B1E;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item .fetch-price-button:hover {
+    background-color: #FFC34A;
+}
+
+/* Price Display */
+.result-price {
+    font-size: 14px;
+    color: #FFD700; /* Gold color for the price */
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Space between price and icon */
+}
+
+.result-price img {
+    width: 20px; /* Silver icon size */
+    height: 20px;
+    vertical-align: middle;
+}
+
+.silver-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: 5px;
+}
+
+/* Footer styling */
 footer {
     text-align: center;
-    padding: 10px;
+    padding: 20px;
     background-color: #1B1B1E;
     color: #FBFFFE;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }

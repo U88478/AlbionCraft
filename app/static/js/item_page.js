@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Populate main item details
         document.getElementById("item-name").textContent = itemData.en_name || "Unknown Item";
+        document.title = document.getElementById("item-name").textContent
         document.getElementById("item-value").innerHTML = `Estimated Market Price: <span id="market-price">${itemData.market_price || 'loading...'}</span>`;
         document.getElementById("item-image").src = itemData.icon_url || generateIconUrl(itemData.unique_name);
 
