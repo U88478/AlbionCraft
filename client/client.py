@@ -72,7 +72,7 @@ def extract_info_from_packet(packet):
 
             if src_ip.startswith("5.188.125.14") or src_ip.startswith("5.188.125.37"):
                 # Location packet
-                location_id_match = re.search(r'20(07|02|04|05|08|02)', ascii_payload)
+                location_id_match = re.search(r'20(07|02|04|05|08)', ascii_payload)
                 if location_id_match:
                     location_id = location_id_match.group(0)
                     current_city = LOCATION_ID_TO_CITY.get(location_id, "Unknown")
